@@ -4,16 +4,23 @@ import sys
 import command
 
 def main():
-    if len(sys.argv) != 3:
-        print(f'usage: {sys.argv[0]} <address> <port>')
+    if len(sys.argv) != 4:
+        print(f'usage: {sys.argv[0]} <tcp|udp> <address> <port>')
         return
 
-    address = sys.argv[1]
-    port = int(sys.argv[2])
+    protocol = sys.argv[1]
+    address = sys.argv[2]
+    port = int(sys.argv[3])
 
     socket.setdefaulttimeout(30)
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if protocol == 'tcp':
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    elif protocol == 'udp':
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    else:
+        print(f'error: unknown protocol \'{protocol}\'')
+        return
 
     try:
         sock.connect((address, port))
