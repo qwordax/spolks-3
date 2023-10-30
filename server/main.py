@@ -74,9 +74,8 @@ def handle_udp(sock):
 
         try:
             while True:
-                args, address = (sock.recvfrom(tcp.BUFSIZE)
-                    .decode('ascii')
-                    .split())
+                args, address = sock.recvfrom(tcp.BUFSIZE)
+                args = args.decode('ascii').split()
 
                 if args[0] == 'close':
                     working = False
@@ -129,7 +128,7 @@ def main():
     if protocol == 'tcp':
         handle_tcp(sock)
     else:
-        handle_udp(sock, address)
+        handle_udp(sock)
 
     logging.info('closing . . .')
     sock.close()
