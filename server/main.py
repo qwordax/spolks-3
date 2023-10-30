@@ -66,7 +66,38 @@ def handle_tcp(sock):
             conn.close()
 
 def handle_udp(sock):
-    pass
+    working = True
+    timeout = 0
+
+    while working and timeout < 3:
+        logging.info('receiving . . .')
+
+        try:
+            while True:
+                args = sock.recv(tcp.BUFSIZE).decode('ascii').split()
+
+                if args[0] == 'close':
+                    working = False
+                    break
+
+                if args[0] == 'exit' or args[0] == 'quit':
+                    continue
+
+                logging.info(' '.join(args))
+
+                if args[0] == 'echo':
+                    udp.server_echo(sock, args)
+                elif args[0] == 'time':
+                    udp.server_time(sock)
+                elif args[0] == 'upload':
+                    udp.server_upload(sock)
+                elif args[0] == 'download':
+                    udp.server_download(sock, args)
+                else:
+                    udp.server_unknown(sock, args)
+        except TimeoutError:
+            logging.info('timeout'); timeout += 1
+            continue
 
 def main():
     if len(sys.argv) != 4:
