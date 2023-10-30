@@ -74,7 +74,9 @@ def handle_udp(sock):
 
         try:
             while True:
-                args = sock.recv(tcp.BUFSIZE).decode('ascii').split()
+                args, address = (sock.recvfrom(tcp.BUFSIZE)
+                    .decode('ascii')
+                    .split())
 
                 if args[0] == 'close':
                     working = False
@@ -86,15 +88,15 @@ def handle_udp(sock):
                 logging.info(' '.join(args))
 
                 if args[0] == 'echo':
-                    udp.server_echo(sock, args)
+                    udp.server_echo(sock, address, args)
                 elif args[0] == 'time':
-                    udp.server_time(sock)
+                    udp.server_time(sock, address)
                 elif args[0] == 'upload':
-                    udp.server_upload(sock)
+                    udp.server_upload(sock, address)
                 elif args[0] == 'download':
-                    udp.server_download(sock, args)
+                    udp.server_download(sock, address, args)
                 else:
-                    udp.server_unknown(sock, args)
+                    udp.server_unknown(sock, address, args)
         except TimeoutError:
             logging.info('timeout'); timeout += 1
             continue
@@ -105,8 +107,7 @@ def main():
         return
 
     protocol = sys.argv[1]
-    address = sys.argv[2]
-    port = int(sys.argv[3])
+    address = (sys.argv[2], int(sys.argv[3]))
 
     logging.basicConfig(
         level=logging.INFO,
@@ -123,12 +124,12 @@ def main():
         print(f'error: unknown protocol \'{protocol}\'')
         return
 
-    sock.bind((address, port))
+    sock.bind(address)
 
     if protocol == 'tcp':
         handle_tcp(sock)
     else:
-        handle_udp(sock)
+        handle_udp(sock, address)
 
     logging.info('closing . . .')
     sock.close()
