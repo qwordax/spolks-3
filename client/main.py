@@ -1,7 +1,8 @@
 import socket
 import sys
 
-import command
+import command_tcp
+import command_udp
 
 def main():
     if len(sys.argv) != 4:
@@ -16,8 +17,20 @@ def main():
 
     if protocol == 'tcp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        command_echo = command_tcp.client_echo
+        command_time = command_tcp.client_time
+        command_upload = command_tcp.client_upload
+        command_download = command_tcp.client_download
+        command_unknown = command_tcp.client_unknown
     elif protocol == 'udp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        command_echo = command_udp.client_echo
+        command_time = command_udp.client_time
+        command_upload = command_udp.client_upload
+        command_download = command_udp.client_download
+        command_unknown = command_udp.client_unknown
     else:
         print(f'error: unknown protocol \'{protocol}\'')
         return
@@ -40,15 +53,15 @@ def main():
                 break
 
             if args[0] == 'echo':
-                command.client_echo(sock, args)
+                command_echo(sock, args)
             elif args[0] == 'time':
-                command.client_time(sock, args)
+                command_time(sock, args)
             elif args[0] == 'upload':
-                command.client_upload(sock, args)
+                command_upload(sock, args)
             elif args[0] == 'download':
-                command.client_download(sock, args)
+                command_download(sock, args)
             else:
-                command.client_unknown(sock, args)
+                command_unknown(sock, args)
         except ConnectionAbortedError:
             print('error: connection aborted')
             break
