@@ -36,7 +36,7 @@ def handle_tcp(sock):
             print('error: timeout')
             break
 
-def handle_udp(sock):
+def handle_udp(sock, address):
     while True:
         args = input('> ').split()
 
@@ -45,19 +45,19 @@ def handle_udp(sock):
 
         try:
             if args[0] == 'close' or args[0] == 'exit' or args[0] == 'quit':
-                sock.send(' '.join(args).encode('ascii'))
+                sock.sendto(' '.join(args).encode('ascii'), address)
                 break
 
             if args[0] == 'echo':
-                udp.client_echo(sock, args)
+                udp.client_echo(sock, address, args)
             elif args[0] == 'time':
-                udp.client_time(sock, args)
+                udp.client_time(sock, address, args)
             elif args[0] == 'upload':
-                udp.client_upload(sock, args)
+                udp.client_upload(sock, address, args)
             elif args[0] == 'download':
-                udp.client_download(sock, args)
+                udp.client_download(sock, address, args)
             else:
-                udp.client_unknown(sock, args)
+                udp.client_unknown(sock, address, args)
         except ConnectionAbortedError:
             print('error: connection aborted')
             break
@@ -74,29 +74,28 @@ def main():
         return
 
     protocol = sys.argv[1]
-    address = sys.argv[2]
-    port = int(sys.argv[3])
+    address = (sys.argv[2], int(sys.argv[3]))
 
     socket.setdefaulttimeout(30)
 
     if protocol == 'tcp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            sock.connect(address)
+        except TimeoutError:
+            print('error: timed out'); sock.close()
+            return
     elif protocol == 'udp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     else:
         print(f'error: unknown protocol \'{protocol}\'')
         return
 
-    try:
-        sock.connect((address, port))
-    except TimeoutError:
-        print('error: timed out'); sock.close()
-        return
-
     if protocol == 'tcp':
         handle_tcp(sock)
     else:
-        handle_udp(sock)
+        handle_udp(sock, address)
 
     sock.close()
 
