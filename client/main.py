@@ -1,8 +1,8 @@
 import socket
 import sys
 
-import command_tcp as tcp
-import command_udp as udp
+import tcp
+import udp
 
 def handle_tcp(sock):
     while True:
