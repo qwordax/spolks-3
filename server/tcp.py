@@ -43,7 +43,7 @@ def server_upload(conn, address):
 
     conn.send(str(current_size).encode('ascii'))
 
-    logging.info('uploading . . .')
+    logging.info(f'uploading \'{file_name}\'')
 
     FATAL = False
 
@@ -68,11 +68,10 @@ def server_upload(conn, address):
             full_size = current_size+size+oob_size
 
             if i % (2*BUFSIZE) == 0:
-                logging.info(f'{int(100*full_size/file_size):3d} %')
+                logging.info(f'{int(100*full_size/file_size):2d} %')
 
             i += 1
 
-        logging.info('100 %')
         logging.info(f'received {size:,.0f} + {oob_size:,.0f} bytes')
         logging.info(f'uploaded \'{file_name}\'')
 
@@ -104,7 +103,7 @@ def server_download(conn, address, args):
 
     current_size = int(conn.recv(BUFSIZE).decode('ascii'))
 
-    logging.info('downloading . . .')
+    logging.info(f'downloading \'{file_name}\'')
 
     FATAL = False
 
@@ -134,11 +133,10 @@ def server_download(conn, address, args):
             full_size = current_size+size+oob_size
 
             if i % (2*BUFSIZE) == 0:
-                logging.info(f'{int(100*full_size/file_size):3d} %')
+                logging.info(f'{int(100*full_size/file_size):2d} %')
 
             i += 1
 
-        logging.info('100 %')
         logging.info(f'transmitted {size:,.0f} + {oob_size:,.0f} bytes')
         logging.info(f'downloaded \'{file_name}\'')
 

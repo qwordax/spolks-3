@@ -34,6 +34,8 @@ def client_upload(sock, args):
 
     current_size = int(sock.recv(BUFSIZE).decode('ascii'))
 
+    print(f'uploading \'{file_name}\'')
+
     with open(file_name, 'rb') as file:
         file.seek(current_size)
 
@@ -57,11 +59,10 @@ def client_upload(sock, args):
             full_size = current_size+size+oob_size
 
             if i % (2*BUFSIZE) == 0:
-                print(f'{int(100*full_size/file_size):3d} %')
+                print(f'{int(100*full_size/file_size):2d} %')
 
             i += 1
 
-        print('100 %')
         print(f'transmitted {size:,.0f} + {oob_size:,.0f} bytes')
         print(f'uploaded \'{file_name}\'')
 
@@ -93,6 +94,8 @@ def client_download(sock, args):
 
     sock.send(str(current_size).encode('ascii'))
 
+    print(f'downloading \'{file_name}\'')
+
     with open(file_name, file_mode) as file:
         i = 0
         oob = file_size // 1024 // 4
@@ -111,11 +114,10 @@ def client_download(sock, args):
             full_size = current_size+size+oob_size
 
             if i % (2*BUFSIZE) == 0:
-                print(f'{int(100*full_size/file_size):3d} %')
+                print(f'{int(100*full_size/file_size):2d} %')
 
             i += 1
 
-        print('100 %')
         print(f'received {size:,.0f} + {oob_size:,.0f} bytes')
         print(f'downloaded \'{file_name}\'')
 
