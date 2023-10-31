@@ -70,7 +70,7 @@ def handle_udp(sock, address):
 
 def main():
     if len(sys.argv) != 4:
-        print(f'usage: {sys.argv[0]} <tcp|udp> <address> <port>')
+        print('usage: %s {tcp|udp} <address> <port>' % sys.argv[0])
         return
 
     protocol = sys.argv[1]

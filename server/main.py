@@ -102,7 +102,7 @@ def handle_udp(sock):
 
 def main():
     if len(sys.argv) != 4:
-        print(f'usage: {sys.argv[0]} <tcp|udp> <address> <port>')
+        print('usage: %s {tcp|udp} <address> <port>' % sys.argv[0])
         return
 
     protocol = sys.argv[1]
@@ -111,7 +111,7 @@ def main():
     logging.basicConfig(
         level=logging.INFO,
         format='%(levelname)-8s : %(message)s'
-        )
+    )
 
     socket.setdefaulttimeout(30)
 
