@@ -103,7 +103,7 @@ def client_download(sock, args):
         size = 0
         oob_size = 0
 
-        while (current_size + size + oob_size) < file_size:
+        while (current_size+size+oob_size) < file_size:
             if i < oob:
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_OOBINLINE, 1)
                 oob_size += file.write(sock.recv(BUFSIZE))
