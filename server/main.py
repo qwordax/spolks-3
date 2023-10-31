@@ -5,7 +5,8 @@ import sys
 import tcp
 import udp
 
-def handle_tcp(sock):
+def handle_tcp(sock, address):
+    sock.bind(address)
     sock.listen(1)
 
     working = True
@@ -65,7 +66,9 @@ def handle_tcp(sock):
 
             conn.close()
 
-def handle_udp(sock):
+def handle_udp(sock, address):
+    sock.bind(address)
+
     working = True
     timeout = 0
 
@@ -117,21 +120,16 @@ def main():
 
     if protocol == 'tcp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        handle_tcp(sock, address)
+
+        sock.close()
     elif protocol == 'udp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        handle_udp(sock, address)
+
+        sock.close()
     else:
         print(f'error: unknown protocol \'{protocol}\'')
-        return
-
-    sock.bind(address)
-
-    if protocol == 'tcp':
-        handle_tcp(sock)
-    else:
-        handle_udp(sock)
-
-    logging.info('closing . . .')
-    sock.close()
 
 if __name__ == "__main__":
     main()

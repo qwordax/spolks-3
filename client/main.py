@@ -4,7 +4,13 @@ import sys
 import tcp
 import udp
 
-def handle_tcp(sock):
+def handle_tcp(sock, address):
+    try:
+        sock.connect(address)
+    except TimeoutError:
+        print('error: timeout')
+        return
+
     while True:
         args = input('> ').split()
 
@@ -80,24 +86,16 @@ def main():
 
     if protocol == 'tcp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        handle_tcp(sock, address)
 
-        try:
-            sock.connect(address)
-        except TimeoutError:
-            print('error: timed out'); sock.close()
-            return
+        sock.close()
     elif protocol == 'udp':
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    else:
-        print(f'error: unknown protocol \'{protocol}\'')
-        return
-
-    if protocol == 'tcp':
-        handle_tcp(sock)
-    else:
         handle_udp(sock, address)
 
-    sock.close()
+        sock.close()
+    else:
+        print(f'error: unknown protocol \'{protocol}\'')
 
 if __name__ == "__main__":
     main()
