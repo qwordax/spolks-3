@@ -58,7 +58,65 @@ def client_upload(sock, address, args):
         print(f'uploaded \'{file_name}\'')
 
 def client_download(sock, address, args):
-    pass
+    if len(args) != 2:
+        print('usage: download <file>')
+        return
+
+    sock.sendto(' '.join(args).encode('ascii'), address)
+    response = sock.recv(BUFSIZE).decode('ascii')
+
+    if response == 'not exists':
+        print(f'error: \'{args[1]}\' does not exists')
+        return
+
+    is_continue = response == 'continue'
+
+    file_info = sock.recv(BUFSIZE).decode('ascii').split()
+
+    file_name = file_info[0]
+    file_size = int(file_info[1])
+
+    if is_continue:
+        current_size = os.path.getsize(file_name)
+        file_mode = 'ab'
+    else:
+        current_size = 0
+        file_mode = 'wb'
+
+    sock.sendto(str(current_size).encode('ascii'), address)
+
+    print(f'downloading \'{file_name}\'')
+
+    i = 0
+    size = 0
+
+    file_dict = dict()
+
+    while True:
+        data = sock.recv(BUFSIZE+4)
+
+        index = int.from_bytes(data[:4])
+        data = data[4:]
+
+        if index == 0:
+            break
+
+        file_dict[index] = data
+
+        size += len(data)
+        full_size = current_size+size
+
+        if i % (2*BUFSIZE) == 0:
+            print(f'{int(100*full_size/file_size):3d} %')
+
+        i += 1
+
+    with open(file_name, file_mode) as file:
+        for _, data in sorted(file_dict.items()):
+            file.write(data)
+
+    print(f'received {size:,.0f} bytes')
+    print(f'downloaded \'{file_name}\'')
 
 def client_unknown(sock, address, args):
     sock.sendto(' '.join(args).encode('ascii'), address)
