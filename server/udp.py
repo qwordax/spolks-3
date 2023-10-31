@@ -52,30 +52,25 @@ def server_upload(sock, address):
     i = 0
     size = 0
 
-    file_dict = dict()
-
-    while True:
-        data = sock.recv(BUFSIZE+4)
-
-        index = int.from_bytes(data[:4])
-        data = data[4:]
-
-        if index == 0:
-            break
-
-        file_dict[index] = data
-
-        size += len(data)
-        full_size = current_size+size
-
-        if i % (2*BUFSIZE) == 0:
-            logging.info(f'{int(100*full_size/file_size):2d} %')
-
-        i += 1
-
     with open(file_name, file_mode) as file:
-        for _, data in sorted(file_dict.items()):
-            file.write(data)
+        while True:
+            data = sock.recv(BUFSIZE+4)
+
+            index = int.from_bytes(data[:4])
+            data = data[4:]
+
+            if index == 0:
+                break
+
+            size += file.write(data)
+            full_size = current_size+size
+
+            sock.sendto('ok'.encode('ascii'), address)
+
+            if i % (2*BUFSIZE) == 0:
+                logging.info(f'{int(100*full_size/file_size):2d} %')
+
+            i += 1
 
     logging.info(f'received {size:,.0f} bytes')
     logging.info(f'uploaded \'{file_name}\'')
@@ -123,6 +118,7 @@ def server_download(sock, address, args):
 
         for data in iter(lambda: file.read(BUFSIZE), b''):
             sock.sendto(int.to_bytes(i+1, length=4)+data, address)
+            sock.recv(BUFSIZE)
 
             size += len(data)
             full_size = current_size+size
