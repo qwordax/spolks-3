@@ -132,10 +132,10 @@ def server_download(sock, address, args):
 
             i += 1
 
-        sock.sendto(int.to_bytes(0, length=4)+bytes(BUFSIZE), address)
+    sock.sendto(int.to_bytes(0, length=4)+bytes(BUFSIZE), address)
 
-        logging.info(f'transmitted {size:,.0f} bytes')
-        logging.info(f'downloaded \'{file_name}\'')
+    logging.info(f'transmitted {size:,.0f} bytes')
+    logging.info(f'downloaded \'{file_name}\'')
 
 def server_unknown(sock, address, args):
     logging.error(f'unknown command \'{" ".join(args)}\'')

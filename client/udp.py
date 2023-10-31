@@ -52,10 +52,10 @@ def client_upload(sock, address, args):
 
             i += 1
 
-        sock.sendto(int.to_bytes(0, length=4)+bytes(BUFSIZE), address);
+    sock.sendto(int.to_bytes(0, length=4)+bytes(BUFSIZE), address);
 
-        print(f'transmitted {size:,.0f} bytes')
-        print(f'uploaded \'{file_name}\'')
+    print(f'transmitted {size:,.0f} bytes')
+    print(f'uploaded \'{file_name}\'')
 
 def client_download(sock, address, args):
     if len(args) != 2:
