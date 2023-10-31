@@ -102,8 +102,8 @@ def handle_udp(sock, address):
                 else:
                     udp.server_unknown(sock, address, args)
         except TimeoutError:
+            udp.FATAL = True
             logging.info('timeout'); timeout += 1
-            continue
 
 def main():
     if len(sys.argv) != 4:
