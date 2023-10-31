@@ -22,6 +22,8 @@ def handle_tcp(sock, address):
             logging.info('timeout'); timeout += 1
             continue
 
+        timeout = 0
+
         try:
             while True:
                 args = conn.recv(tcp.BUFSIZE).decode('ascii').split()
