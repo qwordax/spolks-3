@@ -17,5 +17,5 @@ with notification (`REJECT` rule). Implement:
   with the client/server in case of absence of control packets within a fixed
   time interval.
 
-* transmission flow control - reducing the load on the receiver in case of
+* transmission flow control — reducing the load on the receiver in case of
   slow processing.
