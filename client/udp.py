@@ -1,4 +1,5 @@
 import os
+import random
 
 BUFSIZE = 1024
 
@@ -42,8 +43,15 @@ def client_upload(sock, address, args):
         size = 0
 
         for data in iter(lambda: file.read(BUFSIZE), b''):
-            sock.sendto(int.to_bytes(i+1, length=4)+data, address)
-            sock.recv(BUFSIZE)
+            while True:
+                sock.sendto(int.to_bytes(
+                    i+1,
+                    byteorder='big',
+                    length=4
+                )+data, address)
+
+                if sock.recv(BUFSIZE).decode('ascii') == 'ok':
+                    break
 
             size += len(data)
             full_size = current_size+size
@@ -53,7 +61,11 @@ def client_upload(sock, address, args):
 
             i += 1
 
-    sock.sendto(int.to_bytes(0, length=4)+bytes(BUFSIZE), address)
+    sock.sendto(int.to_bytes(
+        0,
+        byteorder='big',
+        length=4
+    )+bytes(BUFSIZE), address)
 
     print(f'transmitted {size:,.0f} bytes')
     print(f'uploaded \'{file_name}\'')
@@ -95,7 +107,7 @@ def client_download(sock, address, args):
         while True:
             data = sock.recv(BUFSIZE+4)
 
-            index = int.from_bytes(data[:4])
+            index = int.from_bytes(data[:4], byteorder='big')
             data = data[4:]
 
             if index == 0:
@@ -104,7 +116,11 @@ def client_download(sock, address, args):
             size += file.write(data)
             full_size = current_size+size
 
-            sock.sendto('ok'.encode('ascii'), address)
+            if random.randint(0, 100) > 5:
+                sock.sendto('ok'.encode('ascii'), address)
+            else:
+                sock.sendto('fail'.encode('ascii'), address)
+                continue
 
             if i % (2*BUFSIZE) == 0:
                 print(f'{int(100*full_size/file_size):3d} %')
